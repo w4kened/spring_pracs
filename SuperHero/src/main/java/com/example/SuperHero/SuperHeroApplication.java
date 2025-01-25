@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class SuperHeroApplication {
+
 	private static final Logger log = LoggerFactory.getLogger(SuperHeroApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(SuperHeroApplication.class, args);
 	}
-
 	@Bean
 	public CommandLineRunner demo(SuperHeroRepository repository, SuperReportRepository repository2) {
 		return (args) -> {
@@ -72,5 +72,4 @@ public class SuperHeroApplication {
 			log.info("");
 		};
 	}
-
 }
