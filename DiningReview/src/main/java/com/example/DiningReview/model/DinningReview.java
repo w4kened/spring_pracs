@@ -2,17 +2,17 @@ package com.example.DiningReview.model;
 
 import com.example.DiningReview.enums.DinningReviewMark;
 import com.example.DiningReview.enums.DinningReviewStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="REVIEWS")
+@Table(name = "DINNING_REVIEWS")
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 public class DinningReview {
@@ -33,8 +33,8 @@ public class DinningReview {
     private DinningReviewMark eggScore;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="DIARY_SCORY")
-    private DinningReviewMark diaryScore;
+    @Column(name="DAIRY_SCORE")
+    private DinningReviewMark dairyScore;
 
     @Column(name="COMMENTARY")
     private String commentary;
@@ -42,12 +42,24 @@ public class DinningReview {
     @Column(name="CREATED_AT")
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name="USER_ID", nullable=false)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "USER_ID", nullable = false)
+    @NonNull
+    @JsonBackReference("user-reviews")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name="RESTAURANT_ID", nullable = false)
+    @NonNull
+    @JsonBackReference("restaurant-reviews")
     private Restaurant restaurant;
 
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
+    public Long getRestaurantId() {
+        return restaurant != null ? restaurant.getId() : null;
+    }
 }

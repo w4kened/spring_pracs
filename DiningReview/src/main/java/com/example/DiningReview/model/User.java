@@ -1,18 +1,9 @@
 package com.example.DiningReview.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.*;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -24,36 +15,35 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue
-    Long id;
+    private Long id;
 
     @Column(name="NAME", unique = true)
     @NonNull
     @JsonProperty
-    String name;
+    private String name;
 
     @Column(name="EMAIL")
-    String email;
+    private String email;
 
     @Column(name="CITY")
-    String city;
+    private String city;
 
     @Column(name="STATE")
-    String state;
+    private String state;
 
     @Column(name="ZIP_CODE")
-    String zipcode;
+    private String zipcode;
 
     @Column(name="PEANUT_ALLERGIES_INTERESTED")
-    Boolean isInterestedInPeanutAllergies;
+    private Boolean isInterestedInPeanutAllergies;
 
     @Column(name="EGG_ALLERGIES_INTERESTED")
-    Boolean isInterestedInEggAllergies;
+    private Boolean isInterestedInEggAllergies;
 
     @Column(name="DAIRY_ALLERGIES_INTERESTED")
-    Boolean isInterestedInDairyAllergies;
+    private Boolean isInterestedInDairyAllergies;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<DinningReview> reviews;
-
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("user-reviews")
+    private Set<DinningReview> reviews;
 }

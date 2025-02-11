@@ -1,6 +1,7 @@
 package com.example.DiningReview.controller;
 
 
+import com.example.DiningReview.model.DinningReview;
 import com.example.DiningReview.model.User;
 import com.example.DiningReview.repository.UserRepository;
 import lombok.NonNull;
@@ -37,25 +38,27 @@ public class UserController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
     @GetMapping("/findByName")
-    public ResponseEntity<Object> getUserByName(@RequestBody User user) {
-        Optional<User> foundedUser  = this.userRepository.findByName(user.getName());
-        if (!foundedUser.isPresent()) {
+    public ResponseEntity<Object> getUserByName(@RequestParam String name) {
+        Optional<User> foundUsers = this.userRepository.findByName(name);
+        if (!foundUsers.isPresent()) {
             String errorMessage = " Failed to find user by name. ";
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(foundedUser, HttpStatus.FOUND);
+        return new ResponseEntity<>(foundUsers, HttpStatus.FOUND);
     }
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(@RequestParam Long id) {
-         Optional<User> optionalUserForDelete = this.userRepository.findById(id);
-        if (!optionalUserForDelete.isPresent()) {
-            return new ResponseEntity<>(" Failed to found user by id ",HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> deleteUser(@RequestParam String name) {
+        Optional<User> foundUsers  = this.userRepository.findByName(name);
+        if (!foundUsers.isPresent()) {
+            String errorMessage = " Failed to find user by name. ";
+            return new ResponseEntity<>(errorMessage,HttpStatus.NOT_FOUND);
         }
-        User userForDelete = optionalUserForDelete.get();
+
+        User userForDelete = foundUsers.get();
         try {
             this.userRepository.delete(userForDelete);
         }   catch (DataAccessException ex) {
-            String errorMessage = " Failed to delete user by id. Error message: " + ex.getMessage();
+            String errorMessage = " Failed to delete user by name. Error message: " + ex.getMessage();
             return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(userForDelete, HttpStatus.OK);
@@ -70,43 +73,31 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
-        Optional<User> optionalUserForUpdate = this.userRepository.findById(id);
+    @PutMapping("/update")
+    public ResponseEntity<Object> updateUser(@RequestParam String name, @RequestBody User user) {
+        Optional<User> optionalUserForUpdate = this.userRepository.findByName(name);
         if (!optionalUserForUpdate.isPresent()) {
-            return new ResponseEntity<>(" Failed to found user by id ",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(" Failed to found user by name ",HttpStatus.NOT_FOUND);
         }
         User userForUpdate = optionalUserForUpdate.get();
-        if (user.getName() != null) {
-            userForUpdate.setName(user.getName());
-        }
-        if (user.getEmail() != null) {
-            userForUpdate.setEmail(user.getEmail());
-        }
-        if (user.getCity() != null) {
-            userForUpdate.setCity(user.getCity());
-        }
-        if (user.getState() != null) {
-            userForUpdate.setState(user.getState());
-        }
-        if (user.getZipcode() != null) {
-            userForUpdate.setZipcode(user.getZipcode());
-        }
-        if (user.getIsInterestedInPeanutAllergies() != null) {
-            userForUpdate.setIsInterestedInPeanutAllergies(
-                    user.getIsInterestedInPeanutAllergies()
-            );
-        }
-        if (user.getIsInterestedInEggAllergies() != null) {
-            userForUpdate.setIsInterestedInEggAllergies(
-                    user.getIsInterestedInEggAllergies()
-            );
-        }
-        if (user.getIsInterestedInDairyAllergies() != null) {
-            userForUpdate.setIsInterestedInDairyAllergies(
-                    user.getIsInterestedInDairyAllergies()
-            );
-        }
+
+        Optional.ofNullable(user.getName())
+                .ifPresent(userForUpdate::setName);
+        Optional.ofNullable(user.getEmail())
+                .ifPresent(userForUpdate::setEmail);
+        Optional.ofNullable(user.getCity())
+                .ifPresent(userForUpdate::setCity);
+        Optional.ofNullable(user.getState())
+                .ifPresent(userForUpdate::setState);
+        Optional.ofNullable(user.getZipcode())
+                .ifPresent(userForUpdate::setZipcode);
+        Optional.ofNullable(user.getIsInterestedInPeanutAllergies())
+                .ifPresent(userForUpdate::setIsInterestedInPeanutAllergies);
+        Optional.ofNullable(user.getIsInterestedInEggAllergies())
+                .ifPresent(userForUpdate::setIsInterestedInEggAllergies);
+        Optional.ofNullable(user.getIsInterestedInDairyAllergies())
+                .ifPresent(userForUpdate::setIsInterestedInDairyAllergies);
+
         User updatedUser = new User();
         try {
             updatedUser = this.userRepository.save(userForUpdate);
