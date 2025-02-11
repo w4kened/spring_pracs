@@ -1,5 +1,5 @@
 Restful API backend application.
-
+```
 User API requests:
 GET
         curl -X GET localhost:8080/api/v1/users | json_pp 
@@ -44,4 +44,4 @@ GET
 POST
         curl -X POST http://localhost:8080/api/v1/admin/approve/1
         curl -X POST http://localhost:8080/api/v1/admin/reject/1
-
+```
